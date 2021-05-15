@@ -111,7 +111,10 @@ variants if you have use cases for them.)"
                *cl+ssl-ssl-foreign-function-names*
                :test 'equal)
      (defcfun-versioned (:since ,since :vanished ,vanished)
-         ,(append name-and-options '(:library libssl))
+         ,(append name-and-options
+                  ;; If foreign libraries were already loaded, the library
+                  ;; cl+ssl::libssl is never loaded, so don't use it.
+                  #-:cl+ssl-foreign-libs-already-loaded '(:library libssl))
        ,@body)))
 
 (defmacro define-ssl-function (name-and-options &body body)
