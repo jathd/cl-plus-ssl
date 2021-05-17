@@ -138,10 +138,10 @@ script:
          -e '(ql:quickload :cl+ssl/package)'
          -e '(format t \"cl+ssl/package loaded.~%\")'
          -e '(cffi:define-foreign-library cl+ssl::libcrypto (t \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libcrypto.so\"))'
-         -e '(cffi:use-foreign-library libcrypto)
+         -e '(cffi:use-foreign-library cl+ssl::libcrypto)
          -e '(format t \"libcrypto.so loaded.~%\")'
          -e '(cffi:define-foreign-library cl+ss::libssl (t \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libssl.so\"))'
-         -e '(cffi:use-foreign-library libssl)
+         -e '(cffi:use-foreign-library cl+ssl::libssl)
          -e '(format t \"libssl.so loaded.~%\")'
          -e '(pushnew :cl+ssl-foreign-libs-already-loaded *features*)'
          -e '(ql:quickload :cl+ssl) ;; load cl+ssl separately from cl+ssl.test only because cl+ssl.test can not be loaded in the :invert readtable-case due to its dependency ironclad, as of 2019-10-20'
