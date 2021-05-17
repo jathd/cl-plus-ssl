@@ -16,7 +16,8 @@
   :description "Common Lisp interface to OpenSSL."
   :license "MIT"
   :author "Eric Marsden, Jochen Schmidt, David Lichteblau"
-  :depends-on (:cffi :trivial-gray-streams :flexi-streams #+sbcl :sb-posix
+  :depends-on (:cl+ssl/package
+               :cffi :trivial-gray-streams :flexi-streams #+sbcl :sb-posix
                #+(and sbcl win32) :sb-bsd-sockets
                :bordeaux-threads :trivial-garbage :uiop
                :usocket
@@ -25,8 +26,8 @@
   :components ((:module "src"
                 :serial t
                 :components
-                ((:file "package")
-                 (:file "reload")
+                ((:file "reload"
+                  :if-feature (:not :cl+ssl-foreign-libs-already-loaded))
                  (:file "conditions")
                  (:file "ffi")
                  (:file "x509")
@@ -38,3 +39,7 @@
                  (:file "random")
                  (:file "context")
                  (:file "verify-hostname")))))
+
+(defsystem :cl+ssl/package
+  :depends-on (:trivial-gray-streams)
+  :components ((:module "src" :components ((:file "package")))))

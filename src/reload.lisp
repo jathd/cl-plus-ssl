@@ -118,7 +118,5 @@
   (:cygwin (:or "cygssl-1.1.dll" "cygssl-1.0.0.dll"))
   (t (:default "libssl3")))
 
-(unless (member :cl+ssl-foreign-libs-already-loaded
-                *features*)
-  (cffi:use-foreign-library libcrypto)
-  (cffi:use-foreign-library libssl))
+(cffi:use-foreign-library libcrypto)
+(cffi:use-foreign-library libssl)

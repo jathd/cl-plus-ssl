@@ -111,10 +111,7 @@ variants if you have use cases for them.)"
                *cl+ssl-ssl-foreign-function-names*
                :test 'equal)
      (defcfun-versioned (:since ,since :vanished ,vanished)
-         ,(append name-and-options
-                  ;; If foreign libraries were already loaded, the library
-                  ;; cl+ssl::libssl is never loaded, so don't use it.
-                  #-:cl+ssl-foreign-libs-already-loaded '(:library libssl))
+         ,(append name-and-options '(:library libssl))
        ,@body)))
 
 (defmacro define-ssl-function (name-and-options &body body)
@@ -137,17 +134,7 @@ variants if you have use cases for them.)"
          ;; others are resolved as openssl functions.
          ;; This mix results in failures, of course.
          ;; We fix these two implementations by passing the :library option.
-         ;; Not for other implementations because this may be
-         ;; incompatible with :cl+ssl-foreign-libs-already-loaded
-         ;; but these two implementations just break without
-         ;; that, so it's better to possibly sacrify the
-         ;; :cl+ssl-foreign-libs-already-loaded (we haven't tested)
-         ;; than have them broken completely.
-         ;; TODO: extend the :cl+ssl-foreign-libs-already-loaded
-         ;; mechanism with possibility for user to specify value
-         ;; for the :library option.
-         ,(append name-and-options
-                  #+(and (or abcl lispworks) darwin) '(:library libcrypto))
+         ,(append name-and-options'(:library libcrypto))
        ,@body)))
 
 (defmacro define-crypto-function (name-and-options &body body)
