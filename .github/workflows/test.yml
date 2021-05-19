@@ -10,8 +10,8 @@ jobs:
       ROSWELL_INSTALL_DIR: ~/.roswell
     strategy:
       matrix:
-        LISP: [sbcl, ccl]
-        OPENSSL: [openssl-1.1.0j, openssl-1.0.0s]
+        LISP: [sbcl]
+        OPENSSL: [openssl-1.1.0j]
         BITS: [64]
 
     steps:
@@ -22,17 +22,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - run: |
-          .roswell/bin/ros -e '(progn
-                   (format t \"(lisp-implementation-type): ~A~%\" (lisp-implementation-type))
-                   (format t \"(lisp-implementation-version): ~A~%\" (lisp-implementation-version))
-                   (format t \"*features*: ~A~%\" *features*)
-                   (format t \"(asdf:asdf-version): ~A~%\" (asdf:asdf-version)))'
-              -e '(ql:quickload :cl+ssl/config)'
-              -e '(cl+ssl:define-libcrypto-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libcrypto.so\")'
-              -e '(cffi:define-libssl-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libssl.so\")'
-              -e '(ql:quickload :cl+ssl.test)'
-              -e '(let ((results (5am:run :cl+ssl)))
-                    (5am:explain! results)
-                    (unless (5am:results-status results)
-                      (uiop:quit 1)))'
+      - run: ls -a ~
+      - run: ls -a ~/.roswell
+      - run: which ros
