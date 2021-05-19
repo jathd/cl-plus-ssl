@@ -16,11 +16,11 @@ jobs:
 
     steps:
 
-      - name: Install Roswell
-        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
-
       - name: Checkout repo
         uses: actions/checkout@v2
+
+      - name: Install Roswell
+        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
 
       - name: Build OpenSSL libraries
         run: |
@@ -29,16 +29,16 @@ jobs:
           test/run-on-many-lisps-and-openssls/openssl-releases/build.sh "${{ matrix.OPENSSL }}" "${{ matrix.BITS }}" > openssl-build.log
 
 
-      - run:
+      - run: |
           ros -e '(progn
-                   (format t "(lisp-implementation-type): ~A~%" (lisp-implementation-type))
-                   (format t "(lisp-implementation-version): ~A~%" (lisp-implementation-version))
-                   (format t "*features*: ~A~%" *features*)
-                   (format t "(asdf:asdf-version): ~A~%" (asdf:asdf-version)))'
-              -e '(ql:quickload :cl+ssl/config)'
-              -e '(cl+ssl:define-libcrypto-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libcrypto.so")'
-              -e '(cffi:define-libssl-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libssl.so")'
-              -e '(ql:quickload :cl+ssl.test)'
+                   (format t \"(lisp-implementation-type): ~A~%\" (lisp-implementation-type))
+                   (format t \"(lisp-implementation-version): ~A~%\" (lisp-implementation-version))
+                   (format t \"*features*: ~A~%\" *features*)
+                   (format t \"(asdf:asdf-version): ~A~%\" (asdf:asdf-version)))' \
+              -e '(ql:quickload :cl+ssl/config)' \
+              -e '(cl+ssl:define-libcrypto-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libcrypto.so\")' \
+              -e '(cffi:define-libssl-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libssl.so\")' \
+              -e '(ql:quickload :cl+ssl.test)' \
               -e '(let ((results (5am:run :cl+ssl)))
                     (5am:explain! results)
                     (unless (5am:results-status results)
