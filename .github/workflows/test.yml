@@ -20,10 +20,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
+      - name: Download roswell install script
+        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh > install-fo-ci.sh
+
+      - name: Cache .roswell
+        id: cache-roswell
+        uses: actions/cache@v2
+        with:
+          path: ~/.roswell
+          key: roswell-${{ matrix.LISP }}-${{ hashFiles('install-for-ci.sh') }}
+
       - name: Install Roswell
+        if: steps.cache-roswell.outputs.cache-hit != 'true'
         run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
 
+      - name: Cache OpenSSL libraries
+        id: cache-openssl
+        uses: actions/cache@v2
+        with:
+          path: test/run-on-many-lisps-and-openssls/openssl-releases/bin/
+          key: openssl-${{ matrix.OPENSSL }}-${{ matrix.BITS }}
+
       - name: Build OpenSSL libraries
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
           test/run-on-many-lisps-and-openssls/openssl-releases/fetch.sh "${{ matrix.OPENSSL }}"
           rm -rf test/run-on-many-lisps-and-openssls/openssl-releases/bin/
