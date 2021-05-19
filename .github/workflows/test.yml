@@ -2,36 +2,37 @@ name: CI
 on:
   push:
     branches: [ test-actions ]
-  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      ROSWELL_INSTALL_DIR: $HOME/.roswell
-      LISP: ccl
+      ROSWELL_INSTALL_DIR: ~/.roswell
+    strategy:
+      matrix:
+        LISP: [sbcl, ccl]
+        OPENSSL: [openssl-1.1.0j, openssl-1.0.0s]
+        BITS: [64]
 
     steps:
 
-      - name: Download Roswell
-        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh > install-for-ci.sh
-
-      - name: Cache Roswell
-        id: cache-roswell
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.roswell
-            ~/.config/common-lisp
-          key: $${{ runner.os }}-${{ hashFiles('install-for-ci.sh') }}
-
-      - name: Install Rowswell
-        run: |
-          sh install-for-ci.sh
+      - name: Install Roswell
+        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
 
       - name: Checkout repo
         uses: actions/checkout@v2
 
       - run: |
-          ls -a ~
-          ls .roswell
+          .roswell/bin/ros -e '(progn
+                   (format t \"(lisp-implementation-type): ~A~%\" (lisp-implementation-type))
+                   (format t \"(lisp-implementation-version): ~A~%\" (lisp-implementation-version))
+                   (format t \"*features*: ~A~%\" *features*)
+                   (format t \"(asdf:asdf-version): ~A~%\" (asdf:asdf-version)))'
+              -e '(ql:quickload :cl+ssl/config)'
+              -e '(cl+ssl:define-libcrypto-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libcrypto.so\")'
+              -e '(cffi:define-libssl-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libssl.so\")'
+              -e '(ql:quickload :cl+ssl.test)'
+              -e '(let ((results (5am:run :cl+ssl)))
+                    (5am:explain! results)
+                    (unless (5am:results-status results)
+                      (uiop:quit 1)))'
