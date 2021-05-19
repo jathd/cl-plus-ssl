@@ -8,8 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        LISP: [sbcl, ccl]
-        OPENSSL: [openssl-1.1.0j, openssl-1.0.0s]
+        LISP: [sbcl, ccl, ecl, abcl]
+        OPENSSL: [openssl-1.1.1a,
+                  openssl-1.1.0j,
+                  openssl-1.0.0s,
+                  openssl-1.0.2q,
+                  openssl-1.0.0s,
+                  openssl-0.9.8zh,
+                  libressl-3.0.1,
+                  libressl-2.8.3,
+                  libressl-2.6.5,
+                  libressl-2.5.5,
+                  libressl-2.2.7]
         BITS: [64]
     env:
       ROSWELL_INSTALL_DIR: ~/.roswell
