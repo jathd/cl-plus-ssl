@@ -38,7 +38,7 @@ jobs:
                    (format t "(asdf:asdf-version): ~A~%" (asdf:asdf-version)))' \
               -e '(ql:quickload :cl+ssl/config)' \
               -e '(cl+ssl:define-libcrypto-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libcrypto.so")' \
-              -e '(cffi:define-libssl-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libssl.so")' \
+              -e '(cl+ssl:define-libssl-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libssl.so")' \
               -e '(ql:quickload :cl+ssl.test)' \
               -e '(let ((results (5am:run :cl+ssl)))
                     (5am:explain! results)
