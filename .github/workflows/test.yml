@@ -22,15 +22,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - run: |
+      - name: Build OpenSSL libraries
+        run: |
+          test/run-on-many-lisps-and-openssls/openssl-releases/fetch.sh "${{ matrix.OPENSSL }}"
+          rm -rf test/run-on-many-lisps-and-openssls/openssl-releases/bin/
+          test/run-on-many-lisps-and-openssls/openssl-releases/build.sh "${{ matrix.OPENSSL }}" "${{ matrix.BITS }}" > openssl-build.log
+
+
+      - run:
           ros -e '(progn
-                   (format t \"(lisp-implementation-type): ~A~%\" (lisp-implementation-type))
-                   (format t \"(lisp-implementation-version): ~A~%\" (lisp-implementation-version))
-                   (format t \"*features*: ~A~%\" *features*)
-                   (format t \"(asdf:asdf-version): ~A~%\" (asdf:asdf-version)))'
+                   (format t "(lisp-implementation-type): ~A~%" (lisp-implementation-type))
+                   (format t "(lisp-implementation-version): ~A~%" (lisp-implementation-version))
+                   (format t "*features*: ~A~%" *features*)
+                   (format t "(asdf:asdf-version): ~A~%" (asdf:asdf-version)))'
               -e '(ql:quickload :cl+ssl/config)'
-              -e '(cl+ssl:define-libcrypto-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libcrypto.so\")'
-              -e '(cffi:define-libssl-path \"test/run-on-many-lisps-and-openssls/openssl-releases/bin/'$OPENSSL-${BITS}bit'/lib/libssl.so\")'
+              -e '(cl+ssl:define-libcrypto-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libcrypto.so")'
+              -e '(cffi:define-libssl-path "test/run-on-many-lisps-and-openssls/openssl-releases/bin/'${{ matrix.OPENSSL }}-${{ matrix.BITS }}bit'/lib/libssl.so")'
               -e '(ql:quickload :cl+ssl.test)'
               -e '(let ((results (5am:run :cl+ssl)))
                     (5am:explain! results)
