@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Download roswell install script
-        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh > install-fo-ci.sh
+        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh > install-for-ci.sh
 
       - name: Cache .roswell
         id: cache-roswell
@@ -31,8 +31,7 @@ jobs:
           key: roswell-${{ matrix.LISP }}-${{ hashFiles('install-for-ci.sh') }}
 
       - name: Install Roswell
-        if: steps.cache-roswell.outputs.cache-hit != 'true'
-        run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
+        run: sh install-for-ci.sh
 
       - name: Cache OpenSSL libraries
         id: cache-openssl
@@ -49,7 +48,8 @@ jobs:
           test/run-on-many-lisps-and-openssls/openssl-releases/build.sh "${{ matrix.OPENSSL }}" "${{ matrix.BITS }}" > openssl-build.log
 
 
-      - run: |
+      - name: Run cl+ssl tests
+        run: |
           ros -e '(progn
                    (format t "(lisp-implementation-type): ~A~%" (lisp-implementation-type))
                    (format t "(lisp-implementation-version): ~A~%" (lisp-implementation-version))
