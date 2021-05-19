@@ -68,6 +68,7 @@
            #:certificate-not-after-time
            #:certificate-not-before-time
            #:certificate-subject-common-names
+           #:certificate-fingerprint
 
            ;; hostname-verification
            #:verify-hostname))
