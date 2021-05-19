@@ -5,40 +5,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-roswell:
+  test:
     runs-on: ubuntu-latest
     env:
       ROSWELL_INSTALL_DIR: $HOME/.roswell
+      LISP: ccl
+
     steps:
+
       - name: Download Roswell
         run: curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh > install-for-ci.sh
+
       - name: Cache Roswell
         id: cache-roswell
         uses: actions/cache@v2
         with:
           path: ~/.roswell
           key: $${{ runner.os }}-${{ hashFiles('install-for-ci.sh') }}
+
       - name: Install Rowswell
-        if: steps.cache-roswell.outputs.cache-it != 'true'
         run: |
           sh install-for-ci.sh
-      - name: Upload Roswell artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: roswell-dir
-          path: ~/.roswell
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup-roswell
-    env:
-      PATH: $HOME/.roswell/bin:$PATH
-    steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: roswell-dir
+
       - run: |
+          ls -a ~
           ls .roswell
+        env:
+          PATH: $HOME/.roswell/bin:$PATH
