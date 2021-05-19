@@ -20,7 +20,9 @@ jobs:
         id: cache-roswell
         uses: actions/cache@v2
         with:
-          path: ~/.roswell
+          path: |
+            ~/.roswell
+            ~/.config/common-lisp
           key: $${{ runner.os }}-${{ hashFiles('install-for-ci.sh') }}
 
       - name: Install Rowswell
@@ -33,5 +35,3 @@ jobs:
       - run: |
           ls -a ~
           ls .roswell
-        env:
-          PATH: $HOME/.roswell/bin:$PATH
